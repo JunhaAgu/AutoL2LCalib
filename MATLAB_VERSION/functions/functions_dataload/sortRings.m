@@ -1,5 +1,6 @@
 function data = sortRings(data)
 
+% TODO: sorted locations are not needed...!
 n_data = data.n_data;
 n_lidars = size(data.pcls,1);
 for k = 1:n_lidars
