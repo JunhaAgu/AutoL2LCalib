@@ -1,7 +1,7 @@
 close all; clear all; clc;
 dbstop error
 
-%%
+%% Path to functions
 addpath('functions/functions_dataload');
 addpath('functions/functions_transform');
 addpath('functions/functions_algorithm');
@@ -21,13 +21,13 @@ l1_n_ring = 16;
 l1_azimuth_res = 0.2;
 l1_elevation_res = 2;
 l1_elevation_min = -15;
-
+%etc
 lim.ang = [-3/4*pi(), 3/4*pi()]; %-pi ~ +pi
 ref_seq = 1 ;
 
-%% Path to datasets
-dir_to_dataset = 'D:\lidar_plane_data\datasets\config_1\'; %'config_1', 'config_2', 'config_3', 'config_4', 'config_perpendicular'
-dataset_name   = 'chess'; %'chess', 'cut', 'long'
+%% Path to datasets & sorting data
+dir_to_dataset = 'D:\lidar_plane_data\datasets\config_2\'; %'config_1', 'config_2', 'config_3', 'config_4', 'config_perpendicular'
+dataset_name   = 'long'; %'chess', 'cut', 'long'
 data_type      = '1cams2lidars';
 
 data = loadData(dir_to_dataset, dataset_name, data_type); % load all data in a dataset
@@ -56,7 +56,7 @@ for m = 1:2
     end
 end
 
-%%
+%% Arrays initialization
 X_0 = cell(data.n_data,1); 
 X_1 = cell(data.n_data,1);
 X_0_ch = cell(data.n_data,1); 
@@ -64,10 +64,10 @@ X_1_ch = cell(data.n_data,1);
 roi_imgs_range = cell(2, data.n_data);
 plane_0 = cell(data.n_data,1);
 plane_1 = cell(data.n_data,1);
-
 mask_invalid_data = false(2,data.n_data);
 
-%interest_data
+%% Plannar board extraction
+%Interest_data
 i_data = 1:data.n_data;
 n_i_data = length(i_data);
 
@@ -78,39 +78,41 @@ for m = 1:2
         %% foreground and outliers suppression
         [roi, roi_3D_pts] = suppOutliersAndExtForeground(data, imgs_rho, imgs_index, ref_seq, m, n);
         
-        %check validity
+        %Check validity
         [out_flag, mask_invalid_data] = checkROI('foreground_outsup', roi, mask_invalid_data, m, n);
         if out_flag
             continue;
         end
         
         %% Target detection & completion
-        %ransac pramaters
+        %Ransac pramaters
         ransac.param.iter   = 50;
         ransac.param.thr    = 0.02; %3cm
         ransac.param.inlier = 0.7*size(roi_3D_pts,2);
         
-        %% RANSAC
+        %RANSAC
         [plane_a,~,~, roi] = ransacPlane(roi_3D_pts, roi, ransac.param);
         
-        %% Restoration
+        %Restoration
         % roi_imgs_range --> for visualization
         [roi, roi_3D_pts, roi_imgs_range{m,n}] = restoreChannel(roi, imgs_rho, imgs_index, data, m, n);
         
+        %Check validity
         [out_flag, mask_invalid_data] = checkROI('restore_channel',roi, mask_invalid_data, m,n);
         if out_flag
             continue;
         end
 
-        %% RANSAC        
+        %RANSAC        
         [plane_b,roi_3D_pts,~,roi] = ransacPlane(roi_3D_pts, roi, ransac.param);
         
+        %Check change between plane_a and plane_b
         [out_flag , mask_invalid_data] = checkRansacPlane(plane_a, plane_b, mask_invalid_data, m,n);
         if out_flag
             continue;
         end
 
-        %% Plane_reweight
+        %% Robust plane fitting using reweighted method
         [plane, ~, mask_reweight, roi] = fitPlaneReweight(roi_3D_pts,roi,1);
         if m==1
             plane_0{n} = plane;
@@ -124,11 +126,11 @@ for m = 1:2
             continue;
         end
         
+        %detection visualization
         scr_visualization_extract;
         
         %%
         [ch, ~] = find(roi>0);
-        
         if m==1
             X_0{n} = roi_3D_pts;
             X_0_ch{n} = ch;
@@ -140,6 +142,7 @@ for m = 1:2
     end %n
 end %m
 
+%% Informaion of invalid data
 fprintf('================ Invalid data ================\n')
 fprintf('[1]-th lidar: ')
 fprintf('%d ',find(mask_invalid_data(1,:)==1))
@@ -150,7 +153,7 @@ fprintf('\n')
 fprintf('==============================================\n')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
+%% Arrange valid data
 mask_invalid_data = sum(mask_invalid_data,1);
 idx_valid_data = find(mask_invalid_data<1);
 n_valid_data = size(idx_valid_data,2); % # of valid data
@@ -163,7 +166,7 @@ data.l1.X_1_ch_valid  = X_1_ch(idx_valid_data,1);
 data.l0.plane_0_valid = plane_0(idx_valid_data,1);
 data.l1.plane_1_valid = plane_1(idx_valid_data,1);
 
-% break, if (# of points < 4)
+% break, if (# of valid measurement < 4)
 if length(data.l0.X_0_valid) < 4
     fprintf('Error: not enough valid measuremetns');
     return;
@@ -193,7 +196,7 @@ R_01 = solveKabsch(data);
 %% Estimate an initial 6-DoF Pose between LiDARs
 [xi_01, T_01] = initialOptimization(R_01, data);
 
-%% Bi directional optimization
+%% Bi directional cost minimization
 [xi_01, T_01, data] = biDirecOptimization(xi_01, T_01, data);
 
 %% Resulting relative pose between two LiDARs.
