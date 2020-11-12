@@ -156,15 +156,15 @@ idx_valid_data = find(mask_invalid_data<1);
 n_valid_data = size(idx_valid_data,2); % # of valid data
 data.n_valid_data = n_valid_data;
 
-data.l0.X_0_     = X_0(idx_valid_data,1);
-data.l1.X_1_     = X_1(idx_valid_data,1);
-data.l0.X_0_ch_  = X_0_ch(idx_valid_data,1);
-data.l1.X_1_ch_  = X_1_ch(idx_valid_data,1);
-data.l0.plane_0_ = plane_0(idx_valid_data,1);
-data.l1.plane_1_ = plane_1(idx_valid_data,1);
+data.l0.X_0_valid     = X_0(idx_valid_data,1);
+data.l1.X_1_valid     = X_1(idx_valid_data,1);
+data.l0.X_0_ch_valid  = X_0_ch(idx_valid_data,1);
+data.l1.X_1_ch_valid  = X_1_ch(idx_valid_data,1);
+data.l0.plane_0_valid = plane_0(idx_valid_data,1);
+data.l1.plane_1_valid = plane_1(idx_valid_data,1);
 
 % break, if (# of points < 4)
-if length(data.l0.X_0_) < 4
+if length(data.l0.X_0_valid) < 4
     fprintf('Error: not enough valid measuremetns');
     return;
 end
@@ -181,10 +181,10 @@ data.l0.n_0 = cell(n_valid_data,1); data.l0.center_0 = cell(n_valid_data,1);
 data.l1.n_1 = cell(n_valid_data,1); data.l1.center_1 = cell(n_valid_data,1);
 
 for i=1:n_valid_data
-    data.l0.n_0{i} = data.l0.plane_0_{i}'; %row -> col
-    data.l1.n_1{i} = data.l1.plane_1_{i}'; %row -> col
-    data.l0.center_0{i} = mean(data.l0.X_0_{i},2);
-    data.l1.center_1{i} = mean(data.l1.X_1_{i},2);
+    data.l0.n_0{i} = data.l0.plane_0_valid{i}'; %row -> col
+    data.l1.n_1{i} = data.l1.plane_1_valid{i}'; %row -> col
+    data.l0.center_0{i} = mean(data.l0.X_0_valid{i},2);
+    data.l1.center_1{i} = mean(data.l1.X_1_valid{i},2);
 end
 
 %% Find initial rotation between LiDARs by Kabsch algorithm (plane normal version)

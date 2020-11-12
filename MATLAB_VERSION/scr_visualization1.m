@@ -1,6 +1,6 @@
 n_valid_data = data.n_valid_data;
-X_0_ = data.l0.X_0_;
-X_1_ = data.l1.X_1_;
+X_0_valid = data.l0.X_0_valid;
+X_1_valid = data.l1.X_1_valid;
 X_0_p = data.l0.X_0_p;
 X_1_p = data.l1.X_1_p;
 X_1_p_warp = data.l1.X_1_p_warp;
@@ -36,10 +36,10 @@ set(gcf,'Color','k'); set(gca,'Color','k'); set(gca,'xcolor','w'); set(gca,'ycol
 % Results of w/ and w/o range offset model 
 figure(); hold on;
 for i = 1:n_valid_data
-    n_pts = length(X_0_{i});
+    n_pts = length(X_0_valid{i});
     hues = 0.4*ones(1,n_pts);
     colors = hsv2rgb([hues;ones(1,n_pts);ones(1,n_pts)]');
-    scatter3(X_0_{i}(1,:),X_0_{i}(2,:),X_0_{i}(3,:),2*ones(1,n_pts), colors); hold on;
+    scatter3(X_0_valid{i}(1,:),X_0_valid{i}(2,:),X_0_valid{i}(3,:),2*ones(1,n_pts), colors); hold on;
     
     n_pts = length(X_0_p{i});
     hues = 0.6*ones(1,n_pts);
@@ -56,10 +56,10 @@ set(gcf,'Color','k'); set(gca,'Color','k'); set(gca,'xcolor','w'); set(gca,'ycol
 % Results of w/ and w/o range offset model
 figure(); hold on;
 for i = 1:n_valid_data
-    n_pts = length(X_1_{i});
+    n_pts = length(X_1_valid{i});
     hues = 0.4*ones(1,n_pts);
     colors = hsv2rgb([hues;ones(1,n_pts);ones(1,n_pts)]');
-    scatter3(X_1_{i}(1,:),X_1_{i}(2,:),X_1_{i}(3,:),2*ones(1,n_pts), colors); hold on;
+    scatter3(X_1_valid{i}(1,:),X_1_valid{i}(2,:),X_1_valid{i}(3,:),2*ones(1,n_pts), colors); hold on;
     
     n_pts = length(X_1_p{i});
     hues = 0.6*ones(1,n_pts);

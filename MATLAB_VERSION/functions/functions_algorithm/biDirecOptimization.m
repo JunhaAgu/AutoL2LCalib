@@ -1,12 +1,12 @@
 function [xi_01, T_01, data] = biDirecOptimization(xi_01, T_01, data)
 
 n_valid_data = data.n_valid_data;
-X_0_     = data.l0.X_0_;
-X_1_     = data.l1.X_1_;
-X_0_ch_  = data.l0.X_0_ch_;
-X_1_ch_  = data.l1.X_1_ch_;
-plane_0_ = data.l0.plane_0_;
-plane_1_ = data.l1.plane_1_;
+X_0_valid     = data.l0.X_0_valid;
+X_1_valid     = data.l1.X_1_valid;
+X_0_ch_valid  = data.l0.X_0_ch_valid;
+X_1_ch_valid  = data.l1.X_1_ch_valid;
+plane_0_valid = data.l0.plane_0_valid;
+plane_1_valid = data.l1.plane_1_valid;
 n_ring_0 = data.l0.spec.n_ring;
 n_ring_1 = data.l1.spec.n_ring;
 
@@ -19,12 +19,12 @@ X_1_p_warp = cell(n_valid_data,1);
 X_1_p = cell(n_valid_data,1);
 
 n_pts0 = 0;
-for i=1:length(X_0_)
-    n_pts0 = n_pts0 + length(X_0_{i}); % # of valid 3D points
+for i=1:length(X_0_valid)
+    n_pts0 = n_pts0 + length(X_0_valid{i}); % # of valid 3D points
 end
 n_pts1 = 0;
-for i=1:length(X_1_)
-    n_pts1 = n_pts1 + length(X_1_{i}); % # of valid 3D points
+for i=1:length(X_1_valid)
+    n_pts1 = n_pts1 + length(X_1_valid{i}); % # of valid 3D points
 end
 
 
@@ -43,19 +43,19 @@ while 1
     T_10 = T_01^-1;
     
     for i = 1:n_valid_data
-        [theta, psi] = generateThetaPsi(X_0_{i});
-        for j=1:length(X_0_{i})
-            X_0_p{i,1}(:,j) = X_0_{i}(:,j) + ...
-                del_rho0(X_0_ch_{i, 1}(j,1), 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
+        [theta, psi] = generateThetaPsi(X_0_valid{i});
+        for j=1:length(X_0_valid{i})
+            X_0_p{i,1}(:,j) = X_0_valid{i}(:,j) + ...
+                del_rho0(X_0_ch_valid{i, 1}(j,1), 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
         end
         X_0_p_warp{i,1} = T_10*[X_0_p{i}; ones(1, length(X_0_p{i}) )];
     end
     
     for ii = 1:n_valid_data
-        [theta, psi] = generateThetaPsi(X_1_{ii});
-        for j=1:length(X_1_{ii})
-            X_1_p{ii,1}(:,j) = X_1_{ii}(:,j) + ...
-                del_rho1(X_1_ch_{ii, 1}(j,1), 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
+        [theta, psi] = generateThetaPsi(X_1_valid{ii});
+        for j=1:length(X_1_valid{ii})
+            X_1_p{ii,1}(:,j) = X_1_valid{ii}(:,j) + ...
+                del_rho1(X_1_ch_valid{ii, 1}(j,1), 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
         end
         X_1_p_warp{ii,1} = T_01*[X_1_p{ii}; ones(1, length(X_1_p{ii}) )];
     end
@@ -63,53 +63,53 @@ while 1
     % Calculate Jacobian
     start_row = 0;
     for i = 1:n_valid_data
-        [theta, psi] = generateThetaPsi(X_1_{i});
-        for j=1:length(X_1_{i})
+        [theta, psi] = generateThetaPsi(X_1_valid{i});
+        for j=1:length(X_1_valid{i})
             M1 = [1 0 0 0 X_1_p_warp{i}(3,j) -X_1_p_warp{i}(2,j); ...
                 0 1 0 -X_1_p_warp{i}(3,j) 0 X_1_p_warp{i}(1,j); ...
                 0 0 1 X_1_p_warp{i}(2,j) -X_1_p_warp{i}(1,j) 0; ...
                 0 0 0 0 0 0];
             M2 = zeros(4, n_ring_0 + n_ring_1);
-            M2(1:3, n_ring_0 + X_1_ch_{i, 1}(j,1)) =...
+            M2(1:3, n_ring_0 + X_1_ch_valid{i, 1}(j,1)) =...
                 T_01(1:3,1:3) * [cos(theta(j))*cos(psi(j)), cos(theta(j))*sin(psi(j)), sin(theta(j))]';
             M = [M1, M2];
-            J(start_row + j,:) = plane_0_{i} * M;
+            J(start_row + j,:) = plane_0_valid{i} * M;
         end
-        start_row = start_row + length(X_1_{i});
+        start_row = start_row + length(X_1_valid{i});
     end
     
     R_10 = T_10(1:3,1:3);
     
     for i = 1:n_valid_data
-        [theta, psi] = generateThetaPsi(X_0_{i});
-        for j=1:length(X_0_{i})
+        [theta, psi] = generateThetaPsi(X_0_valid{i});
+        for j=1:length(X_0_valid{i})
             M1 = [ -R_10, [-R_10(7)*X_0_p{i}(2,j)+R_10(4)*X_0_p{i}(3,j) , R_10(7)*X_0_p{i}(1,j)-R_10(1)*X_0_p{i}(3,j) , -R_10(4)*X_0_p{i}(1,j)+R_10(1)*X_0_p{i}(2,j);...
                 -R_10(8)*X_0_p{i}(2,j)+R_10(5)*X_0_p{i}(3,j) , R_10(8)*X_0_p{i}(1,j)-R_10(2)*X_0_p{i}(3,j) , -R_10(5)*X_0_p{i}(1,j)+R_10(2)*X_0_p{i}(2,j);...
                 -R_10(9)*X_0_p{i}(2,j)+R_10(6)*X_0_p{i}(3,j) , R_10(9)*X_0_p{i}(1,j)-R_10(3)*X_0_p{i}(3,j) , -R_10(6)*X_0_p{i}(1,j)+R_10(3)*X_0_p{i}(2,j)];...
                 0, 0, 0, 0 , 0, 0];
             M2 = zeros(4, n_ring_0+ n_ring_1);
-            M2(1:3, X_0_ch_{i, 1}(j,1)) =...
+            M2(1:3, X_0_ch_valid{i, 1}(j,1)) =...
                 T_10(1:3,1:3) * [cos(theta(j))*cos(psi(j)), cos(theta(j))*sin(psi(j)), sin(theta(j))]';
             M = [M1, M2];
-            J(start_row + j,:) = plane_1_{i} * M;
+            J(start_row + j,:) = plane_1_valid{i} * M;
         end
-        start_row = start_row + length(X_0_{i});
+        start_row = start_row + length(X_0_valid{i});
     end
     
     % Calculate residual
     start_row = 0;
     for i = 1:n_valid_data
-        for j=1:length(X_1_{i})
-            r(start_row + j) = plane_0_{i} *  X_1_p_warp{i,1}(:,j);
+        for j=1:length(X_1_valid{i})
+            r(start_row + j) = plane_0_valid{i} *  X_1_p_warp{i,1}(:,j);
         end
-        start_row = start_row + length(X_1_{i});
+        start_row = start_row + length(X_1_valid{i});
     end
     
     for i = 1:n_valid_data
-        for j=1:length(X_0_{i})
-            r(start_row + j) = plane_1_{i} *  X_0_p_warp{i,1}(:,j);
+        for j=1:length(X_0_valid{i})
+            r(start_row + j) = plane_1_valid{i} *  X_0_p_warp{i,1}(:,j);
         end
-        start_row = start_row + length(X_0_{i});
+        start_row = start_row + length(X_0_valid{i});
     end
     
     r_total(:,iter)=r;
@@ -149,8 +149,8 @@ while 1
         plane_0_p{i} = plane;
     end
     
-    plane_0_ = plane_0_p;
-    plane_1_ = plane_1_p;
+    plane_0_valid = plane_0_p;
+    plane_1_valid = plane_1_p;
     
     fprintf('norm(delta_s) %d-th iter: %f\n',iter,norm(delta_s))
     if(norm(delta_s) <= 1e-3)
