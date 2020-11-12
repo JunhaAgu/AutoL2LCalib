@@ -1,4 +1,4 @@
-function [roi, roi_3D_pts] = foreground_outsup(data, imgs_rho,imgs_index,ref_seq,m,n)
+function [roi, roi_3D_pts] = suppOutliersAndExtForeground(data, imgs_rho,imgs_index,ref_seq,m,n)
 
         diff_rho=imgs_rho{m,n}-imgs_rho{m,ref_seq};
         

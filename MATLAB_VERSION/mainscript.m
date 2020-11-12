@@ -11,10 +11,17 @@ global D2R R2D
 D2R = pi/180; R2D = 180/pi;
 
 %% User-define parameters
-n_ring = 16;
-azimuth_res = 0.2;
-elevation.res = 2;
-elevation.min = -15;
+%lidar0 hardware spec
+l0_n_ring = 16;
+l0_azimuth_res = 0.2;
+l0_elevation_res = 2;
+l0_elevation_min = -15;
+%lidar1 hardware spec
+l1_n_ring = 16;
+l1_azimuth_res = 0.2;
+l1_elevation_res = 2;
+l1_elevation_min = -15;
+
 lim.ang = [-3/4*pi(), 3/4*pi()]; %-pi ~ +pi
 ref_seq = 1 ;
 
@@ -29,6 +36,15 @@ data = sortRings(data); % generate ".pcls_rings", ".IndexRings" in "data".
 fprintf('# of data: %d\n', data.n_data);
 fprintf('==============================================\n')
 
+data.l0.spec.n_ring = l0_n_ring;
+data.l0.spec.azimuth_res = l0_azimuth_res;
+data.l0.spec.elevation_res = l0_elevation_res;
+data.l0.spec.elevation_min = l0_elevation_min;
+data.l1.spec.n_ring = l1_n_ring;
+data.l1.spec.azimuth_res = l1_azimuth_res;
+data.l1.spec.elevation_res = l1_elevation_res;
+data.l1.spec.elevation_min = l1_elevation_min;
+
 %% generate lidar image
 imgs_intensity = cell(2,data.n_data);
 imgs_rho       = cell(2,data.n_data);
@@ -36,8 +52,7 @@ imgs_index     = cell(2,data.n_data);
 
 for m = 1:2
     for n = 1:data.n_data
-        [imgs_intensity{m,n}, imgs_rho{m,n}, imgs_index{m,n}] = ...
-            generateLidarImages(data.pcls{m,n}, azimuth_res, elevation, n_ring, lim);
+        [imgs_intensity{m,n}, imgs_rho{m,n}, imgs_index{m,n}] = generateLidarImages(data, lim, m, n);
     end
 end
 
@@ -61,10 +76,10 @@ for m = 1:2
         roi = [];
         
         %% foreground and outliers suppression
-        [roi, roi_3D_pts] = foreground_outsup(data, imgs_rho, imgs_index, ref_seq, m, n);
+        [roi, roi_3D_pts] = suppOutliersAndExtForeground(data, imgs_rho, imgs_index, ref_seq, m, n);
         
         %check validity
-        [out_flag, mask_invalid_data] = check_n_pts('foreground_outsup', roi, mask_invalid_data, m, n);
+        [out_flag, mask_invalid_data] = checkROI('foreground_outsup', roi, mask_invalid_data, m, n);
         if out_flag
             continue;
         end
@@ -76,27 +91,27 @@ for m = 1:2
         ransac.param.inlier = 0.7*size(roi_3D_pts,2);
         
         %% RANSAC
-        [plane_a,~,~, roi] = ransac_plane(roi_3D_pts, roi, ransac.param);
+        [plane_a,~,~, roi] = ransacPlane(roi_3D_pts, roi, ransac.param);
         
         %% Restoration
         % roi_imgs_range --> for visualization
-        [roi, roi_3D_pts, roi_imgs_range{m,n}] = restore_channel(roi, imgs_rho, imgs_index, data, m, n);
+        [roi, roi_3D_pts, roi_imgs_range{m,n}] = restoreChannel(roi, imgs_rho, imgs_index, data, m, n);
         
-        [out_flag, mask_invalid_data] = check_n_pts('restore_channel',roi, mask_invalid_data, m,n);
+        [out_flag, mask_invalid_data] = checkROI('restore_channel',roi, mask_invalid_data, m,n);
         if out_flag
             continue;
         end
 
         %% RANSAC        
-        [plane_b,roi_3D_pts,~,roi] = ransac_plane(roi_3D_pts, roi, ransac.param);
+        [plane_b,roi_3D_pts,~,roi] = ransacPlane(roi_3D_pts, roi, ransac.param);
         
-        [out_flag , mask_invalid_data] = check_ransac_plane(plane_a, plane_b, mask_invalid_data, m,n);
+        [out_flag , mask_invalid_data] = checkRansacPlane(plane_a, plane_b, mask_invalid_data, m,n);
         if out_flag
             continue;
         end
 
         %% Plane_reweight
-        [plane, ~, mask_reweight, roi] = plane_reweight(roi_3D_pts,roi,1);
+        [plane, ~, mask_reweight, roi] = fitPlaneReweight(roi_3D_pts,roi,1);
         if m==1
             plane_0{n} = plane;
         elseif m==2
@@ -104,25 +119,12 @@ for m = 1:2
         end
         
         [out_flag, mask_invalid_data,roi,roi_3D_pts] = ...
-            check_ratio_pts('plane_reweight',mask_reweight, mask_invalid_data,roi, imgs_index, data, m,n);
+            checkRatioPts('plane_reweight',mask_reweight, mask_invalid_data,roi, imgs_index, data, m,n);
         if out_flag
             continue;
         end
         
-        % visualization
-        figure(100); hold on;
-        n_roi_pts = size(roi_3D_pts,2);
-        if m==1
-            hues = 0.4*ones(1,n_roi_pts);
-        elseif m==2
-            hues = 0.6*ones(1,n_roi_pts);
-        end
-        colors = hsv2rgb([hues;ones(1,n_roi_pts);ones(1,n_roi_pts)]');
-        scatter3(roi_3D_pts(1,:),roi_3D_pts(2,:),roi_3D_pts(3,:),1*ones(1,n_roi_pts), colors); hold on;
-        set(gcf,'Color','k'); set(gca,'Color','k'); set(gca,'xcolor','w'); set(gca,'ycolor','w'); set(gca,'zcolor','w');
-        title('Planar Board Extraction (Total)','Color','y','FontSize', 15);
-        view(-40, 30); axis equal; grid on;
-        title(num2str(n));
+        scr_visualization_extract;
         
         %%
         [ch, ~] = find(roi>0);
@@ -151,8 +153,8 @@ fprintf('==============================================\n')
 %%
 mask_invalid_data = sum(mask_invalid_data,1);
 idx_valid_data = find(mask_invalid_data<1);
-n_v_data = size(idx_valid_data,2); % # of valid data
-data.n_v_data = n_v_data;
+n_valid_data = size(idx_valid_data,2); % # of valid data
+data.n_valid_data = n_valid_data;
 
 data.l0.X_0_     = X_0(idx_valid_data,1);
 data.l1.X_1_     = X_1(idx_valid_data,1);
@@ -175,10 +177,10 @@ end
 %% =======================================================================
 %% =======================================================================
 %% Normal vectors & center initialization
-data.l0.n_0 = cell(n_v_data,1); data.l0.center_0 = cell(n_v_data,1);
-data.l1.n_1 = cell(n_v_data,1); data.l1.center_1 = cell(n_v_data,1);
+data.l0.n_0 = cell(n_valid_data,1); data.l0.center_0 = cell(n_valid_data,1);
+data.l1.n_1 = cell(n_valid_data,1); data.l1.center_1 = cell(n_valid_data,1);
 
-for i=1:n_v_data
+for i=1:n_valid_data
     data.l0.n_0{i} = data.l0.plane_0_{i}'; %row -> col
     data.l1.n_1{i} = data.l1.plane_1_{i}'; %row -> col
     data.l0.center_0{i} = mean(data.l0.X_0_{i},2);
@@ -189,10 +191,10 @@ end
 R_01 = solveKabsch(data);
 
 %% Estimate an initial 6-DoF Pose between LiDARs
-[xi_01, T_01] = initial_opt(R_01, data);
+[xi_01, T_01] = initialOptimization(R_01, data);
 
 %% Bi directional optimization
-[xi_01, T_01, data] = bi_direc_opt(xi_01, T_01, n_ring, data);
+[xi_01, T_01, data] = biDirecOptimization(xi_01, T_01, data);
 
 %% Resulting relative pose between two LiDARs.
 R_01 = T_01(1:3,1:3);

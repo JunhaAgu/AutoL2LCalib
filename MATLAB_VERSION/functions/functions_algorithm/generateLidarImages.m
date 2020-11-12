@@ -1,6 +1,19 @@
-function [img_intense, img_rho, img_index] = generateLidarImages(pcls, azimuth_res, elevation, n_ring, lim)
+function [img_intense, img_rho, img_index] = generateLidarImages(data, lim, m, n)
 D2R = pi/180; R2D = 180/pi;
 twopi = 2*pi;
+
+pcls = data.pcls{m,n};
+if m==1
+    azimuth_res = data.l0.spec.azimuth_res;
+    elevation_res = data.l0.spec.elevation_res;
+    elevation_min = data.l0.spec.elevation_min;
+    n_ring = data.l0.spec.n_ring;
+elseif m==2
+    azimuth_res = data.l1.spec.azimuth_res;
+    elevation_res = data.l1.spec.elevation_res;
+    elevation_min = data.l1.spec.elevation_min;
+    n_ring = data.l1.spec.n_ring;
+end
 
 ang_lim = lim.ang;
 
@@ -54,7 +67,7 @@ mask_dup = zeros(n_ring,360*az_step+1);
 
 for i = 1:n_pts
     if theta(i) > ang_lim(1,1)+offset_psi && theta(i) < ang_lim(1,2)+offset_psi
-        i_row = round( ( (phi(i)*R2D) - elevation.min)/elevation.res + 1 );
+        i_row = round( ( (phi(i)*R2D) - elevation_min)/elevation_res + 1 );
         i_col = round(theta(i)*az_step*R2D)+1;
         
         if img_rho(i_row,i_col)~=0

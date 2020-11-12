@@ -1,4 +1,4 @@
-n_v_data = data.n_v_data;
+n_valid_data = data.n_valid_data;
 X_0_ = data.l0.X_0_;
 X_1_ = data.l1.X_1_;
 X_0_p = data.l0.X_0_p;
@@ -12,7 +12,7 @@ n_0_p =  data.l0.n_0_p;
 % With considering delta_rho, points measured by LiDAR0 and points measured
 % by LiDAR1 are represented in LiDAR0 coordinate frame.
 figure(); hold on;
-for i = 1:n_v_data
+for i = 1:n_valid_data
     n_pts = length(X_0_p{i});
     hues = 0.4*ones(1,n_pts);
     colors = hsv2rgb([hues;ones(1,n_pts);ones(1,n_pts)]');
@@ -35,7 +35,7 @@ set(gcf,'Color','k'); set(gca,'Color','k'); set(gca,'xcolor','w'); set(gca,'ycol
 %%
 % Results of w/ and w/o range offset model 
 figure(); hold on;
-for i = 1:n_v_data
+for i = 1:n_valid_data
     n_pts = length(X_0_{i});
     hues = 0.4*ones(1,n_pts);
     colors = hsv2rgb([hues;ones(1,n_pts);ones(1,n_pts)]');
@@ -55,7 +55,7 @@ set(gcf,'Color','k'); set(gca,'Color','k'); set(gca,'xcolor','w'); set(gca,'ycol
 %%
 % Results of w/ and w/o range offset model
 figure(); hold on;
-for i = 1:n_v_data
+for i = 1:n_valid_data
     n_pts = length(X_1_{i});
     hues = 0.4*ones(1,n_pts);
     colors = hsv2rgb([hues;ones(1,n_pts);ones(1,n_pts)]');

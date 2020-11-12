@@ -135,18 +135,18 @@ end
 pcl_lidar = cell(n_lidars,n_data);
 if(n_lidars == 1)
    for i = 1:n_data
-      pcl_lidar{1,i} = pcread_custom(name_lidar0{1,i});
+      pcl_lidar{1,i} = pcreadCustom(name_lidar0{1,i});
    end
 elseif(n_lidars == 2)
    for i = 1:n_data
-      pcl_lidar{1,i} = pcread_custom(name_lidar0{1,i});
-      pcl_lidar{2,i} = pcread_custom(name_lidar1{1,i});
+      pcl_lidar{1,i} = pcreadCustom(name_lidar0{1,i});
+      pcl_lidar{2,i} = pcreadCustom(name_lidar1{1,i});
    end
 elseif(n_lidars == 3)
    for i = 1:n_data
-      pcl_lidar{1,i} = pcread_custom(name_lidar0{1,i});
-      pcl_lidar{2,i} = pcread_custom(name_lidar1{1,i});
-      pcl_lidar{3,i} = pcread_custom(name_lidar2{1,i});
+      pcl_lidar{1,i} = pcreadCustom(name_lidar0{1,i});
+      pcl_lidar{2,i} = pcreadCustom(name_lidar1{1,i});
+      pcl_lidar{3,i} = pcreadCustom(name_lidar2{1,i});
    end
 else
    assert(false,'Error occurs in [loadHCEData]: unknown mode!\n');
