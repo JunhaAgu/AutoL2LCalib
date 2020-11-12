@@ -1,13 +1,16 @@
-function [roi_out,roi_3D_pts, roi_imgs_range] = restore_channel(roi, imgs_range, imgs_index, data, m, n)
+function [roi_out, roi_3D_pts, roi_imgs_range] = restore_channel(roi, imgs_range, imgs_index, data, m, n)
 %%%%% input %%%%%
-% roi            : 0 or 1 mask  -> n_ring x n_step
+% roi            : logical      -> n_ring x n_step
 % imgs_range     : range value
+% imgs_index     : correnspondence to imgs_range
+% data           : all data structure
 % m              : which lidar
 % n              : which sequence
 
 %%%%% output %%%%%
-% new_roi        : 0 or 1 mask  -> n_ring x n_step
-% new_imgs_range : range value  -> n_ring x n_step
+% roi_out        : logical      -> n_ring x n_step
+% roi_3D_pts     : 3D points    -> 3 X M (M<=N)
+% roi_imgs_range : range value  -> n_ring x n_step
 
 img_range = imgs_range{m,n};
 
@@ -75,7 +78,7 @@ end %i_ch
 
 %% validate whether # of points is sufficient in a channel.
 for i=valid_ch
-   if sum(roi_out(i,:))<30 %50
+   if sum(roi_out(i,:))<10 %50
       roi_out(i,:)=0;
       roi_imgs_range(i,:)=0;
    end
@@ -86,7 +89,7 @@ if nnz(sum(roi_out,2)>0)<3
    roi_imgs_range = zeros(size(img_range));
 end
 
-% forground region only.
+% foreground region only.
 mid = sum(roi_imgs_range(:))/nnz(roi_out);
 idx_forg = roi_imgs_range(:) < mid+2;
 roi_out = and(roi_out, reshape(idx_forg,size(roi_out)));

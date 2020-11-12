@@ -1,3 +1,6 @@
+del_rho0 = data.l0.del_rho0;
+del_rho1 = data.l1.del_rho1;
+
 X_1_rot_all  = cell(data.n_data,1);
 
 % range limits
@@ -8,9 +11,9 @@ i_lims = [0,255]; % reflection intensity range.
 dist_lims = 1.5;
 
 X_lidar = cell(size(data.pcls,1),data.n_data);
-X_ring = cell(size(data.pcls,1),data.n_data);
+X_ring  = cell(size(data.pcls,1),data.n_data);
 
-for n = 1:data.n_data%:-1:1
+for n = 1:data.n_data
     idxs = findCondition(data.pcls{1,n}, x_lims, y_lims, z_lims, dist_lims, i_lims);
     X    = data.pcls{1,n}.Location(:,idxs);
     X_lidar{1,n} = X;
@@ -31,7 +34,7 @@ for i = 1:data.n_data
     [theta, psi] = theta_psi_generator(X_lidar{1, i});
     for j=1:length(X_lidar{1, i})
         X_0_all_p{i,1}(:,j) = X_lidar{1, i}(:,j) + ...
-            ab_0(X_ring{1,i}(1,j)+1, 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
+            del_rho0(X_ring{1,i}(1,j)+1, 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
     end
 end
 
@@ -41,12 +44,13 @@ for i = 1:data.n_data
     [theta, psi] = theta_psi_generator(X_lidar{2, i});
     for j=1:length(X_lidar{2, i})
         X_1_all_p{i,1}(:,j) = X_lidar{2, i}(:,j) + ...
-        ab_1(X_ring{2,i}(1,j)+1, 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
+        del_rho1(X_ring{2,i}(1,j)+1, 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
     end
     X_1_all_p_warp{i,1} = T_01*[X_1_all_p{i}; ones(1, length(X_1_all_p{i}) )];
 end
 
-for i = 1:data.n_data
+%% you can see all the results
+for i = 1 %1:data.n_data
     
     figure();
 
@@ -62,15 +66,14 @@ for i = 1:data.n_data
     colors = hsv2rgb([hues,ones(n_pts,1),ones(n_pts,1)]);
     markersizes = 1*ones(n_pts,1);
     scatter3(X_1_all_p_warp{i,1}(1,:),X_1_all_p_warp{i,1}(2,:),X_1_all_p_warp{i,1}(3,:), markersizes,colors);
-    hold on;
     
-    plot3(0,0,0,'m*','MarkerSize',10,'LineWidth',1);
-    plot3(0,0,0,'ms','MarkerSize',10,'LineWidth',1);
-    plot3(t_01(1,1),t_01(2,1),t_01(3,1),'g*','MarkerSize',10,'LineWidth',1);
-    plot3(t_01(1,1),t_01(2,1),t_01(3,1),'gs','MarkerSize',10,'LineWidth',1);
+    plot3(0,0,0,'g*','MarkerSize',10,'LineWidth',1);
+    plot3(0,0,0,'gs','MarkerSize',10,'LineWidth',1);
+    plot3(t_01(1,1),t_01(2,1),t_01(3,1),'b*','MarkerSize',10,'LineWidth',1);
+    plot3(t_01(1,1),t_01(2,1),t_01(3,1),'bs','MarkerSize',10,'LineWidth',1);
     axis equal;
     xlabel('X'); ylabel('Y'); zlabel('Z');
-    title([ num2str(i) 'th warping: Green(lidar0), Blue(lidar1)'] ,'Color', 'y','FontSize', 15);
+    title([ num2str(i) 'th warping: Green(LiDAR0), Blue(LiDAR1) w/ offset model'] ,'Color', 'y','FontSize', 15);
     grid on;
     set(gcf,'Color','k'); set(gca,'Color','k'); set(gca,'xcolor','w'); set(gca,'ycolor','w'); set(gca,'zcolor','w')
     view(0,90);

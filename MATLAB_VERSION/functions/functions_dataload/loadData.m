@@ -1,5 +1,6 @@
 function data = loadData(data_name, dataset_name, mode_environment)
-% mode: '2cams1lidar', '2cams2lidars', '2cams3lidars'
+% mode: '2cams1lidar', '2cams2lidars', '2cams3lidars', '0cams2lidars',
+% '0cams1lidars', '1cams2lidars'
 time=[];
 name_cam0   = cell(0);
 name_cam1   = cell(0);
@@ -150,7 +151,6 @@ elseif(n_lidars == 3)
 else
    assert(false,'Error occurs in [loadHCEData]: unknown mode!\n');
 end
-
 
 
 % save data structure

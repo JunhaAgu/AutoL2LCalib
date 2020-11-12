@@ -7,6 +7,6 @@ if abs(dot(a,b))>0.9
 else
     out_flag = 1;
     mask_invalid_data(m,n) = 1;
-    fprintf('==========> Lidar%d data %d a lot of outliers \n',m-1,n);
+    fprintf('==========> Lidar%d data%d: wrongly plane detection \n',m-1,n);
 end
 end
