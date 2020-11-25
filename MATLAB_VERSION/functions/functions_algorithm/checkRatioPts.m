@@ -1,5 +1,5 @@
 function [out_flag, mask_invalid_data,roi,roi_3D_pts] = checkRatioPts(step,mask_reweight, mask_invalid_data, roi, imgs_index, data, m,n)
-if(strcmp(step,'plane_reweight'))
+if(strcmp(step,'fitPlaneReweight'))
     if nnz(mask_reweight)/size(mask_reweight,1)  > 0.80 % && ~isempty(mask_reweight)
         out_flag = 0;
             idx_out = sum(roi,2)<20;

@@ -11,6 +11,11 @@ function [roi_out, roi_3D_pts, roi_imgs_range] = restoreChannel(roi, imgs_range,
 % roi_out        : logical      -> n_ring x n_step
 % roi_3D_pts     : 3D points    -> 3 X M (M<=N)
 % roi_imgs_range : range value  -> n_ring x n_step
+if m==1
+    spec_acc = data.l0.spec.accuracy;
+elseif m==2
+    spec_acc = data.l1.spec.accuracy;
+end
 
 img_range = imgs_range{m,n};
 
@@ -46,7 +51,7 @@ for i_ch = valid_ch
                   break
                end
                left_range_val = img_range(i_ch,pre_az_step-1);
-               if abs(left_range_val-pre_range_val) > 3*(0.03+0.2*pi/180*pre_range_val) %change_val
+               if abs(left_range_val-pre_range_val) > 3*(spec_acc+0.2*pi/180*pre_range_val) %change_val
                   break
                end
                roi_out(i_ch,pre_az_step-1)=1;
@@ -63,7 +68,7 @@ for i_ch = valid_ch
                   break
                end
                right_range_val = img_range(i_ch,pre_az_step+1);
-               if abs(right_range_val-pre_range_val) > 3*(0.03+0.2*pi/180*pre_range_val) %change_val
+               if abs(right_range_val-pre_range_val) > 3*(spec_acc+0.2*pi/180*pre_range_val) %change_val
                   break
                end
                roi_out(i_ch,pre_az_step+1)=1;

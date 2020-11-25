@@ -16,11 +16,13 @@ l0_n_ring = 16;
 l0_azimuth_res = 0.2;
 l0_elevation_res = 2;
 l0_elevation_min = -15;
+l0_accuracy = 0.03;
 %lidar1 hardware spec
 l1_n_ring = 16;
 l1_azimuth_res = 0.2;
 l1_elevation_res = 2;
 l1_elevation_min = -15;
+l1_accuracy = 0.03;
 %etc
 lim.ang = [-3/4*pi(), 3/4*pi()]; %-pi ~ +pi
 ref_seq = 1 ;
@@ -40,10 +42,13 @@ data.l0.spec.n_ring = l0_n_ring;
 data.l0.spec.azimuth_res = l0_azimuth_res;
 data.l0.spec.elevation_res = l0_elevation_res;
 data.l0.spec.elevation_min = l0_elevation_min;
+data.l0.spec.accuracy = l0_accuracy;
+
 data.l1.spec.n_ring = l1_n_ring;
 data.l1.spec.azimuth_res = l1_azimuth_res;
 data.l1.spec.elevation_res = l1_elevation_res;
 data.l1.spec.elevation_min = l1_elevation_min;
+data.l1.spec.accuracy = l1_accuracy;
 
 %% generate lidar image
 imgs_intensity = cell(2,data.n_data);
@@ -79,7 +84,7 @@ for m = 1:2
         [roi, roi_3D_pts] = suppOutliersAndExtForeground(data, imgs_rho, imgs_index, ref_seq, m, n);
         
         %Check validity
-        [out_flag, mask_invalid_data] = checkROI('foreground_outsup', roi, mask_invalid_data, m, n);
+        [out_flag, mask_invalid_data] = checkROI('suppOutliersAndExtForeground', roi, mask_invalid_data, m, n);
         if out_flag
             continue;
         end
@@ -98,7 +103,7 @@ for m = 1:2
         [roi, roi_3D_pts, roi_imgs_range{m,n}] = restoreChannel(roi, imgs_rho, imgs_index, data, m, n);
         
         %Check validity
-        [out_flag, mask_invalid_data] = checkROI('restore_channel',roi, mask_invalid_data, m,n);
+        [out_flag, mask_invalid_data] = checkROI('restoreChannel',roi, mask_invalid_data, m,n);
         if out_flag
             continue;
         end
@@ -121,7 +126,7 @@ for m = 1:2
         end
         
         [out_flag, mask_invalid_data,roi,roi_3D_pts] = ...
-            checkRatioPts('plane_reweight',mask_reweight, mask_invalid_data,roi, imgs_index, data, m,n);
+            checkRatioPts('fitPlaneReweight',mask_reweight, mask_invalid_data,roi, imgs_index, data, m,n);
         if out_flag
             continue;
         end
