@@ -14,6 +14,7 @@ if(strcmp(step,'fitPlaneReweight'))
     else
         out_flag = 1;
         mask_invalid_data(m,n) = 1;
+        roi_3D_pts = [];
         fprintf('==========> Lidar%d data%d: inlier ratio: < 0.8 after <reweight>\n',m-1,n);
     end
 

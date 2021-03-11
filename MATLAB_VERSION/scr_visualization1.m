@@ -68,6 +68,6 @@ for i = 1:n_valid_data
 end
 axis equal;
 xlabel('X'); ylabel('Y'); zlabel('Z');
-title('Lidar0: Green(No \Delta\rho), Blue(considering \Delta\rho)' ,'Color', 'y');
+title('Lidar1: Green(No \Delta\rho), Blue(considering \Delta\rho)' ,'Color', 'y');
 grid on;
 set(gcf,'Color','k'); set(gca,'Color','k'); set(gca,'xcolor','w'); set(gca,'ycolor','w'); set(gca,'zcolor','w')
