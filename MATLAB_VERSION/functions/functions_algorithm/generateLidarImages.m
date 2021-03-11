@@ -24,7 +24,7 @@ rho   = zeros(1,n_pts);
 theta   = zeros(1,n_pts);
 phi = zeros(1,n_pts);
 
-offset_psi = pi;
+offset_theta = pi;
 
 for i = 1:n_pts
     
@@ -38,15 +38,15 @@ for i = 1:n_pts
     sinpsi = X(2)*invrhocos;
     if(cospsi >= 0)
         if(sinpsi >=0) % 1 quadrant
-            theta(i) = acos(cospsi)+offset_psi;
+            theta(i) = acos(cospsi)+offset_theta;
         else % 4 quadrant
-            theta(i) = twopi-acos(cospsi)+offset_psi;
+            theta(i) = twopi-acos(cospsi)+offset_theta;
         end
     else
         if(sinpsi >=0) % 2 quadrant
-            theta(i) = pi-acos(-cospsi)+offset_psi;
+            theta(i) = pi-acos(-cospsi)+offset_theta;
         else % 3 quadrant
-            theta(i) = pi+acos(-cospsi)+offset_psi;
+            theta(i) = pi+acos(-cospsi)+offset_theta;
         end
     end
     if(theta(i) >= twopi)
@@ -66,7 +66,7 @@ img_index_dup = cell(n_ring,360*az_step+1);
 mask_dup = zeros(n_ring,360*az_step+1);
 
 for i = 1:n_pts
-    if theta(i) > ang_lim(1,1)+offset_psi && theta(i) < ang_lim(1,2)+offset_psi
+    if theta(i) > ang_lim(1,1)+offset_theta && theta(i) < ang_lim(1,2)+offset_theta
         i_row = round( ( (phi(i)*R2D) - elevation_min)/elevation_res + 1 );
         i_col = round(theta(i)*az_step*R2D)+1;
         

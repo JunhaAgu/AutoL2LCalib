@@ -31,20 +31,20 @@ end
 
 X_0_all_p = cell(data.n_data,1);
 for i = 1:data.n_data
-    [theta, psi] = generateThetaPsi(X_lidar{1, i});
+    [phi, theta] = generateThetaPsi(X_lidar{1, i});
     for j=1:length(X_lidar{1, i})
         X_0_all_p{i,1}(:,j) = X_lidar{1, i}(:,j) + ...
-            del_rho0(X_ring{1,i}(1,j)+1, 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
+            del_rho0(X_ring{1,i}(1,j)+1, 1) * [cos(phi(j))*cos(theta(j)); cos(phi(j))*sin(theta(j)); sin(phi(j))];
     end
 end
 
 X_1_all_p = cell(data.n_data,1);
 X_1_all_p_warp = cell(data.n_data,1);
 for i = 1:data.n_data
-    [theta, psi] = generateThetaPsi(X_lidar{2, i});
+    [phi, theta] = generateThetaPsi(X_lidar{2, i});
     for j=1:length(X_lidar{2, i})
         X_1_all_p{i,1}(:,j) = X_lidar{2, i}(:,j) + ...
-        del_rho1(X_ring{2,i}(1,j)+1, 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
+        del_rho1(X_ring{2,i}(1,j)+1, 1) * [cos(phi(j))*cos(theta(j)); cos(phi(j))*sin(theta(j)); sin(phi(j))];
     end
     X_1_all_p_warp{i,1} = T_01*[X_1_all_p{i}; ones(1, length(X_1_all_p{i}) )];
 end

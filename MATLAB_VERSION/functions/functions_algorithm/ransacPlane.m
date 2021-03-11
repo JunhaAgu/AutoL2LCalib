@@ -77,7 +77,7 @@ end
 max_cnt=find(inlier_cnt==max(inlier_cnt));
 mini_pre=1000;
 
-% delete duplicates
+% select among candidates
 if length(max_cnt)>1
     n_candi=length(max_cnt);
     for i_can=1:n_candi

@@ -19,8 +19,8 @@ pcl_data.XLimits = [];
 pcl_data.YLimits = [];
 pcl_data.ZLimits = [];
 
-pcl_data.XLimits = [min(pcl_data.Location(:,1)),max(pcl_data.Location(:,1))];
-pcl_data.YLimits = [min(pcl_data.Location(:,2)),max(pcl_data.Location(:,2))];
-pcl_data.ZLimits = [min(pcl_data.Location(:,3)),max(pcl_data.Location(:,3))];
+pcl_data.XLimits = [min(pcl_data.Location(1,:)),max(pcl_data.Location(1,:))];
+pcl_data.YLimits = [min(pcl_data.Location(2,:)),max(pcl_data.Location(2,:))];
+pcl_data.ZLimits = [min(pcl_data.Location(3,:)),max(pcl_data.Location(3,:))];
 fclose(f);
 end

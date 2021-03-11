@@ -43,19 +43,19 @@ while 1
     T_10 = T_01^-1;
     
     for i = 1:n_valid_data
-        [theta, psi] = generateThetaPsi(X_0_valid{i});
+        [phi, theta] = generateThetaPsi(X_0_valid{i});
         for j=1:length(X_0_valid{i})
             X_0_p{i,1}(:,j) = X_0_valid{i}(:,j) + ...
-                del_rho0(X_0_ch_valid{i, 1}(j,1), 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
+                del_rho0(X_0_ch_valid{i, 1}(j,1), 1) * [cos(phi(j))*cos(theta(j)); cos(phi(j))*sin(theta(j)); sin(phi(j))];
         end
         X_0_p_warp{i,1} = T_10*[X_0_p{i}; ones(1, length(X_0_p{i}) )];
     end
     
     for ii = 1:n_valid_data
-        [theta, psi] = generateThetaPsi(X_1_valid{ii});
+        [phi, theta] = generateThetaPsi(X_1_valid{ii});
         for j=1:length(X_1_valid{ii})
             X_1_p{ii,1}(:,j) = X_1_valid{ii}(:,j) + ...
-                del_rho1(X_1_ch_valid{ii, 1}(j,1), 1) * [cos(theta(j))*cos(psi(j)); cos(theta(j))*sin(psi(j)); sin(theta(j))];
+                del_rho1(X_1_ch_valid{ii, 1}(j,1), 1) * [cos(phi(j))*cos(theta(j)); cos(phi(j))*sin(theta(j)); sin(phi(j))];
         end
         X_1_p_warp{ii,1} = T_01*[X_1_p{ii}; ones(1, length(X_1_p{ii}) )];
     end
@@ -63,7 +63,7 @@ while 1
     % Calculate Jacobian
     start_row = 0;
     for i = 1:n_valid_data
-        [theta, psi] = generateThetaPsi(X_1_valid{i});
+        [phi, theta] = generateThetaPsi(X_1_valid{i});
         for j=1:length(X_1_valid{i})
             M1 = [1 0 0 0 X_1_p_warp{i}(3,j) -X_1_p_warp{i}(2,j); ...
                 0 1 0 -X_1_p_warp{i}(3,j) 0 X_1_p_warp{i}(1,j); ...
@@ -71,7 +71,7 @@ while 1
                 0 0 0 0 0 0];
             M2 = zeros(4, n_ring_0 + n_ring_1);
             M2(1:3, n_ring_0 + X_1_ch_valid{i, 1}(j,1)) =...
-                T_01(1:3,1:3) * [cos(theta(j))*cos(psi(j)), cos(theta(j))*sin(psi(j)), sin(theta(j))]';
+                T_01(1:3,1:3) * [cos(phi(j))*cos(theta(j)), cos(phi(j))*sin(theta(j)), sin(phi(j))]';
             M = [M1, M2];
             J(start_row + j,:) = plane_0_valid{i} * M;
         end
@@ -81,7 +81,7 @@ while 1
     R_10 = T_10(1:3,1:3);
     
     for i = 1:n_valid_data
-        [theta, psi] = generateThetaPsi(X_0_valid{i});
+        [phi, theta] = generateThetaPsi(X_0_valid{i});
         for j=1:length(X_0_valid{i})
             M1 = [ -R_10, [-R_10(7)*X_0_p{i}(2,j)+R_10(4)*X_0_p{i}(3,j) , R_10(7)*X_0_p{i}(1,j)-R_10(1)*X_0_p{i}(3,j) , -R_10(4)*X_0_p{i}(1,j)+R_10(1)*X_0_p{i}(2,j);...
                 -R_10(8)*X_0_p{i}(2,j)+R_10(5)*X_0_p{i}(3,j) , R_10(8)*X_0_p{i}(1,j)-R_10(2)*X_0_p{i}(3,j) , -R_10(5)*X_0_p{i}(1,j)+R_10(2)*X_0_p{i}(2,j);...
@@ -89,7 +89,7 @@ while 1
                 0, 0, 0, 0 , 0, 0];
             M2 = zeros(4, n_ring_0+ n_ring_1);
             M2(1:3, X_0_ch_valid{i, 1}(j,1)) =...
-                T_10(1:3,1:3) * [cos(theta(j))*cos(psi(j)), cos(theta(j))*sin(psi(j)), sin(theta(j))]';
+                T_10(1:3,1:3) * [cos(phi(j))*cos(theta(j)), cos(phi(j))*sin(theta(j)), sin(phi(j))]';
             M = [M1, M2];
             J(start_row + j,:) = plane_1_valid{i} * M;
         end

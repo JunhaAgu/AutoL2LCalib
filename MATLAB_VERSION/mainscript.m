@@ -28,12 +28,12 @@ lim.ang = [-3/4*pi(), 3/4*pi()]; %-pi ~ +pi
 ref_seq = 1 ;
 
 %% Path to datasets & sorting data
-dir_to_dataset = 'D:\lidar_plane_data\datasets\config_2\'; %'config_1', 'config_2', 'config_3', 'config_4', 'config_perpendicular'
-dataset_name   = 'long'; %'chess', 'cut', 'long'
+dir_to_dataset = 'D:\lidar_plane_data\datasets\config_1\'; %'config_1', 'config_2', 'config_3', 'config_4', 'config_perpendicular'
+dataset_name   = 'cut'; %'chess', 'cut', 'long'
 data_type      = '1cams2lidars';
 
 data = loadData(dir_to_dataset, dataset_name, data_type); % load all data in a dataset
-data = sortRings(data); % generate ".pcls_rings", ".IndexRings" in "data".
+% data = sortRings(data); % generate ".pcls_rings", ".IndexRings" in "data".
 
 fprintf('# of data: %d\n', data.n_data);
 fprintf('==============================================\n')
