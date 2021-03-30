@@ -1,6 +1,6 @@
 ## AutoL2LCalib: an Automated LiDAR-to-LiDAR Extrinsic Pose Calibrator
 <p align = "center">
-<img src= "https://github.com/ChanghyeonKim93/dumm/blob/master/imgs/aligned_four_lidars.png" alt="aligned four lidars via the AutoL2LCalib" width="450" height="470">
+<img src= "https://github.com/JunhaAgu/AutoL2LCalib/blob/main/imgs/aligned_four_lidars.png" alt="aligned four lidars via the AutoL2LCalib" width="450" height="470">
 </p> 
 
 ## 1. Descriptions
@@ -45,7 +45,7 @@ We provides two versions: MATLAB and C++ (with ROS).
 Our program uses 3D point clouds from two LiDARs as forms of **" *.pcd "** files. 
 The data fields of the pcd files could be like below,
 <p align = "left">
-<img src= "https://github.com/ChanghyeonKim93/dumm/blob/master/imgs/pcd_structure.png" alt="pcd file inside" width="250" height="270">
+<img src= "https://github.com/JunhaAgu/AutoL2LCalib/blob/main/imgs/pcd_structure.png" alt="pcd file inside" width="250" height="270">
 </p> 
 
 
