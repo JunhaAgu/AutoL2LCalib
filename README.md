@@ -86,4 +86,13 @@ TBD ASAP.
 
 
 ## 3. Cite AutoL2LCalib
-Thank you for citing our AutoL2LCalib paper if you use any of this code:
+Thank you for citing our *AutoL2LCalib* paper if you use any of this code:
+
+  @inproceedings{
+  title={Automated Extrinsic Calibration for 3D LiDARs with Range Offset Correction using an Arbitrary Planar Board},
+  author={J. Kim, C. Kim, Y. Han, and HJ Kim},
+  booktitle={IEEE International Conference on Robotics and Automation (ICRA)},
+  pages={5082-5088},
+  year={2021},
+  organization={IEEE}
+  }
