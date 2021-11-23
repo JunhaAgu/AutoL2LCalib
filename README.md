@@ -82,3 +82,8 @@ You can modify the settings at the top of the mainscript.m to fit your own 3D Li
 
 ### 3) C++ version
 TBD ASAP.
+
+
+
+## 3. Cite AutoL2LCalib
+Thank you for citing our AutoL2LCalib paper if you use any of this code:
