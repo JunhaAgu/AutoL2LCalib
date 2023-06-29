@@ -4,7 +4,8 @@
 </p> 
 
 ## 1. Descriptions
-**Note:** This program is for a paper "Automated Extrinsic Calibration for 3D LiDARs with Range Offset Correction using an Arbitrary Planar Board" revealed at IEEE ICRA2021.
+**Note:** This software is based on our conference paper (IEEE ICRA 2021):
+* J. Kim, C. Kim, Y. Han, and H. J. Kim, "Automated Extrinsic Calibration for 3D LiDARs with Range Offset Correction using an Arbitrary Planar Board"
 
 The **AutoL2LCalib** is a program to estimate an extrinsic relative pose of two 3D LiDARs by only using point clouds from the LiDARs without any aid of other sensors, such as cameras, inertial measurement units (IMUs), global positioning systems (GPS). By compensating range offset errors for each channel of LiDARs, accuracy of the relative pose estimation is improved.
 
